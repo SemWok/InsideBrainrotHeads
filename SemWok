@@ -1,106 +1,33 @@
+local P,RS,CG=game:GetService("Players"),game:GetService("ReplicatedStorage"),game:GetService("CoreGui")
+local LP=P.LocalPlayer;if CG:FindFirstChild("SemWokHub_Classic")then CG.SemWokHub_Classic:Destroy()end
+local SG=Instance.new("ScreenGui",CG);SG.Name="SemWokHub_Classic";SG.ResetOnSpawn=false
+local rem=RS:WaitForChild("packages"):WaitForChild("_Index"):WaitForChild("littensy_remo@1.5.3"):WaitForChild("remo"):WaitForChild("container")
 
--- ==========================================================
--- SEMWOK HUB V42 - INVISIBLE WATERMARK ON CLOSE
--- ==========================================================
-local Players = game:GetService("Players")
-local RS = game:GetService("ReplicatedStorage")
-local LP = Players.LocalPlayer
-local CoreGui = game:GetService("CoreGui")
-
--- [ CLEANUP ]
-if CoreGui:FindFirstChild("SemWokHub_Final") then CoreGui.SemWokHub_Final:Destroy() end
-
-local SG = Instance.new("ScreenGui", CoreGui)
-SG.Name = "SemWokHub_Final"
-SG.ResetOnSpawn = false
-
--- [ SHARED VARIABLES ]
-local savedPos = nil
-local remContainer = RS:WaitForChild("packages"):WaitForChild("_Index"):WaitForChild("littensy_remo@1.5.3"):WaitForChild("remo"):WaitForChild("container")
-
--- [ FUNCTIONS ]
-local function KillCharacter()
-    if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        task.wait(0.1)
-        LP.Character.Humanoid.Health = 0
-    end
+local function F(n,p,s,t)
+    local f=Instance.new("Frame",SG);f.Name=n;f.BackgroundColor3=Color3.new(0,0,0);f.BorderSizePixel=2;f.BorderColor3=Color3.fromRGB(60,60,60);f.Position=p;f.Size=s;f.Active=true;f.Draggable=true;f.ClipsDescendants=true
+    local tl=Instance.new("TextLabel",f);tl.Size=UDim2.new(1,0,0,42);tl.RichText=true;tl.Text="<b>"..t:upper().."</b>";tl.TextColor3=Color3.fromRGB(255,255,255);tl.Font=3;tl.TextSize=22;tl.BackgroundColor3=Color3.fromRGB(30,30,30);tl.BorderSizePixel=0
+    local tg=Instance.new("TextButton",f);tg.Size=UDim2.new(0,30,0,30);tg.Position=UDim2.new(1,-35,0,6);tg.Text="▼";tg.TextColor3=Color3.new(0,0,0);tg.BackgroundTransparency=1;tg.Font=3;tg.TextSize=20;tg.ZIndex=5
+    local c=Instance.new("Frame",f);c.Name="C";c.Size=UDim2.new(1,0,1,-42);c.Position=UDim2.new(0,0,0,42);c.BackgroundTransparency=1
+    tg.MouseButton1Click:Connect(function()local op=c.Visible;c.Visible=not op;f:TweenSize(not op and s or UDim2.new(0,s.X.Offset,0,42),"Out","Quad",0.15)end)
+    return c 
 end
 
-local function DoBaseTeleport()
-    if savedPos and LP.Character:FindFirstChild("HumanoidRootPart") then
-        LP.Character.HumanoidRootPart.CFrame = savedPos
-        task.spawn(KillCharacter)
-    end
-end
-
-local function SpawnMiniTPMenu()
-    if CoreGui:FindFirstChild("SemWokMiniMenu") then return end
-    local MiniSG = Instance.new("ScreenGui", CoreGui)
-    MiniSG.Name = "SemWokMiniMenu"
-    local F = Instance.new("Frame", MiniSG)
-    F.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    F.Position = UDim2.new(0.45, 0, 0.45, 0)
-    F.Size = UDim2.new(0, 120, 0, 50)
-    F.Active = true; F.Draggable = true
-    
-    local SetB = Instance.new("TextButton", F)
-    SetB.Size = UDim2.new(0, 50, 0, 30); SetB.Position = UDim2.new(0, 5, 0, 10)
-    SetB.Text = "Set"; SetB.BackgroundColor3 = Color3.fromRGB(150, 0, 0); SetB.TextColor3 = Color3.new(1,1,1)
-    
-    local TPB = Instance.new("TextButton", F)
-    TPB.Size = UDim2.new(0, 50, 0, 30); TPB.Position = UDim2.new(0, 65, 0, 10)
-    TPB.Text = "TP"; TPB.BackgroundColor3 = Color3.fromRGB(150, 0, 0); TPB.TextColor3 = Color3.new(1,1,1)
-
-    SetB.MouseButton1Click:Connect(function() 
-        savedPos = LP.Character.HumanoidRootPart.CFrame 
-        SetB.Text = "Saved!"; task.wait(0.5); SetB.Text = "Set"
+local function B(p,t,v,c)
+    local b=Instance.new("TextButton",p);b.Size=UDim2.new(1,0,0,45);b.Position=UDim2.new(0,0,0,(#p:GetChildren()-1)*45);b.BackgroundTransparency=1;b.RichText=true;b.Text="<b>  "..t.."</b>";b.TextColor3=Color3.fromRGB(255,255,255);b.Font=3;b.TextSize=18;b.TextXAlignment=0
+    local box=Instance.new("Frame",b);box.Size=UDim2.new(0,22,0,22);box.Position=UDim2.new(1,-30,0.5,-11);box.BackgroundColor3=Color3.new(0,0,0);box.BorderColor3=Color3.fromRGB(100,100,100);box.BorderSizePixel=2
+    local chk=Instance.new("TextLabel",box);chk.Size=UDim2.new(1,0,1,0);chk.BackgroundTransparency=1;chk.Text="";chk.TextColor3=Color3.new(0,0,0);chk.RichText=true;chk.TextSize=16;chk.Font=3;chk.TextYAlignment=1
+    b.MouseButton1Click:Connect(function()
+        if v then _G[v]=not _G[v];chk.Text=_G[v] and "<b>✔</b>" or "";box.BackgroundColor3=_G[v] and Color3.new(1,0,0) or Color3.new(0,0,0);box.BorderColor3=_G[v] and Color3.new(1,0,0) or Color3.fromRGB(100,100,100) end;c()
     end)
-    TPB.MouseButton1Click:Connect(DoBaseTeleport)
+    return b 
 end
 
--- [ UI BUILDER ]
-local function CreateFrame(name, pos, size, titleTxt)
-    local f = Instance.new("Frame", SG)
-    f.Name = name; f.BackgroundColor3 = Color3.fromRGB(20, 20, 20); f.Position = pos; f.Size = size
-    f.Active = true; f.Draggable = true; f.ClipsDescendants = true -- Ini penting agar isi hilang saat diclose
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
-    
-    local title = Instance.new("TextLabel", f)
-    title.Size = UDim2.new(1, 0, 0, 40); title.Position = UDim2.new(0, 0, 0, 0)
-    title.Text = titleTxt; title.TextColor3 = Color3.new(1, 1, 1)
-    title.Font = Enum.Font.SourceSansBold; title.TextSize = 16; title.BackgroundTransparency = 1
-    title.TextXAlignment = Enum.TextXAlignment.Center
-    
-    local toggleBtn = Instance.new("TextButton", f)
-    toggleBtn.Size = UDim2.new(0, 30, 0, 30); toggleBtn.Position = UDim2.new(1, -35, 0, 5)
-    toggleBtn.Text = "▼"; toggleBtn.TextColor3 = Color3.new(1, 1, 1)
-    toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    toggleBtn.BorderSizePixel = 0
-    Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 4)
-    
-    -- Kontainer Isi agar Watermark ikut tersembunyi
-    local content = Instance.new("Frame", f)
-    content.Name = "Content"
-    content.Size = UDim2.new(1, 0, 1, -40); content.Position = UDim2.new(0, 0, 0, 40)
-    content.BackgroundTransparency = 1; content.ClipsDescendants = true
+-- Main Menu
+local MC=F("M",UDim2.new(0.05,0,0.2,0),UDim2.new(0,220,0,320),"BASE MENU")
 
-    local isOpen = true
-    toggleBtn.MouseButton1Click:Connect(function()
-        isOpen = not isOpen
-        f:TweenSize(isOpen and size or UDim2.new(0, size.X.Offset, 0, 40), "Out", "Quad", 0.2)
-        toggleBtn.Text = isOpen and "▼" or "▲"
-        content.Visible = isOpen -- Menyembunyikan seluruh isi termasuk watermark
-    end)
-    return content
-end
+B(MC,"Auto Collect Money","aC",function() task.spawn(function()while _G.aC do for i=1,48 do pcall(function()rem["data.base.collectPadMoney"]:InvokeServer(i)end)end;task.wait(0.5)end end) end)
+B(MC,"Auto Upgrade Base","aU",function() task.spawn(function()while _G.aU do pcall(function()rem["data.base.upgradeBase"]:FireServer()end);task.wait(0.5)end end) end)
+B(MC,"Auto Buy All Coils","aB",function() task.spawn(function()while _G.aB do for _,n in pairs({"red","blue","yellow","water","lava","poison","abyss","inferno","dream","rainbow","magma"})do pcall(function()rem["data.toolShop.buySpeedCoil"]:FireServer(n)end)end;task.wait(1)end end) end)
+B(MC,"Auto Rebirth","aR",function() task.spawn(function()while _G.aR do pcall(function()rem["data.base.rebirth"]:FireServer()end);task.wait(1)end end) end)
 
-local function AddBtn(parent, txt, callback)
-    local b = Instance.new("TextButton", parent)
-    b.Size = UDim2.new(0.92, 0, 0, 35)
-    b.Position = UDim2.new(0.04, 0, 0, (#parent:GetChildren()-1)*40 + 5)
-    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40); b.Text = txt; b.TextColor3 = Color3.new(1, 1, 1)
-    b.Font = Enum.Font.SourceSansBold; b.TextSize = 14
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
-    b.MouseButton1Click:Connect(callback)
-    return b
-end
+local w=Instance.new("TextLabel",MC);w.Name="WM";w.Size=UDim2.new(1,0,0,35);w.Position=UDim2.new(0,0,1,-35);w.RichText=true;w.Text="<b>YouTube: SemWok</b>";w.TextColor3=Color3.fromRGB(255,255,255);w.Font=3;w.TextSize=20;w.BackgroundColor3=Color3.new(0,0,0);w.BackgroundTransparency=0.3
