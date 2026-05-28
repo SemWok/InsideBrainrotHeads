@@ -1,15 +1,15 @@
 -- ==========================================================
--- SEMWOK HUB V42 - INVISIBLE WATERMARK ON CLOSE
+-- SEMWOK HUB V46 - FULL VERSION (PLAYERGUI) [TITLES UPDATED]
 -- ==========================================================
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local LP = Players.LocalPlayer
-local CoreGui = game:GetService("CoreGui")
+local PlayerGui = LP:WaitForChild("PlayerGui")
 
 -- [ CLEANUP ]
-if CoreGui:FindFirstChild("SemWokHub_Final") then CoreGui.SemWokHub_Final:Destroy() end
+if PlayerGui:FindFirstChild("SemWokHub_Final") then PlayerGui.SemWokHub_Final:Destroy() end
 
-local SG = Instance.new("ScreenGui", CoreGui)
+local SG = Instance.new("ScreenGui", PlayerGui)
 SG.Name = "SemWokHub_Final"
 SG.ResetOnSpawn = false
 
@@ -33,8 +33,8 @@ local function DoBaseTeleport()
 end
 
 local function SpawnMiniTPMenu()
-    if CoreGui:FindFirstChild("SemWokMiniMenu") then return end
-    local MiniSG = Instance.new("ScreenGui", CoreGui)
+    if PlayerGui:FindFirstChild("SemWokMiniMenu") then return end
+    local MiniSG = Instance.new("ScreenGui", PlayerGui)
     MiniSG.Name = "SemWokMiniMenu"
     local F = Instance.new("Frame", MiniSG)
     F.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -61,14 +61,20 @@ end
 local function CreateFrame(name, pos, size, titleTxt)
     local f = Instance.new("Frame", SG)
     f.Name = name; f.BackgroundColor3 = Color3.fromRGB(20, 20, 20); f.Position = pos; f.Size = size
-    f.Active = true; f.Draggable = true; f.ClipsDescendants = true -- Ini penting agar isi hilang saat diclose
+    f.Active = true; f.Draggable = true; f.ClipsDescendants = false
     Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
     
     local title = Instance.new("TextLabel", f)
     title.Size = UDim2.new(1, 0, 0, 40); title.Position = UDim2.new(0, 0, 0, 0)
     title.Text = titleTxt; title.TextColor3 = Color3.new(1, 1, 1)
-    title.Font = Enum.Font.SourceSansBold; title.TextSize = 16; title.BackgroundTransparency = 1
-    title.TextXAlignment = Enum.TextXAlignment.Center
+    -- JUDUL DI PERBESAR KE 18 DAN BOLD
+    title.Font = Enum.Font.SourceSansBold; title.TextSize = 18; title.BackgroundTransparency = 1
+    
+    local ytClosed = Instance.new("TextLabel", f)
+    ytClosed.Name = "WatermarkClosed"
+    ytClosed.Size = UDim2.new(1, 0, 0, 40); ytClosed.Position = UDim2.new(0, 0, 0, 0)
+    ytClosed.Text = "YOUTUBE: SEMWOK"; ytClosed.TextColor3 = Color3.new(1, 1, 1)
+    ytClosed.Font = Enum.Font.SourceSansBold; ytClosed.TextSize = 15; ytClosed.BackgroundTransparency = 1; ytClosed.Visible = false
     
     local toggleBtn = Instance.new("TextButton", f)
     toggleBtn.Size = UDim2.new(0, 30, 0, 30); toggleBtn.Position = UDim2.new(1, -35, 0, 5)
@@ -77,18 +83,31 @@ local function CreateFrame(name, pos, size, titleTxt)
     toggleBtn.BorderSizePixel = 0
     Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 4)
     
-    -- Kontainer Isi agar Watermark ikut tersembunyi
     local content = Instance.new("Frame", f)
     content.Name = "Content"
-    content.Size = UDim2.new(1, 0, 1, -40); content.Position = UDim2.new(0, 0, 0, 40)
+    content.Size = UDim2.new(1, 0, 1, -80); content.Position = UDim2.new(0, 0, 0, 45)
     content.BackgroundTransparency = 1; content.ClipsDescendants = true
+    
+    local ytInside = Instance.new("TextLabel", f)
+    ytInside.Size = UDim2.new(1, 0, 0, 40)
+    ytInside.AnchorPoint = Vector2.new(0.5, 1)
+    ytInside.Position = UDim2.new(0.5, 0, 1, 0)
+    ytInside.Text = "YOUTUBE: SEMWOK"
+    ytInside.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ytInside.Font = Enum.Font.SourceSansBold; ytInside.TextSize = 15
+    ytInside.BackgroundTransparency = 1
+    ytInside.TextXAlignment = Enum.TextXAlignment.Center
+    ytInside.TextYAlignment = Enum.TextYAlignment.Center
 
     local isOpen = true
     toggleBtn.MouseButton1Click:Connect(function()
         isOpen = not isOpen
         f:TweenSize(isOpen and size or UDim2.new(0, size.X.Offset, 0, 40), "Out", "Quad", 0.2)
         toggleBtn.Text = isOpen and "▼" or "▲"
-        content.Visible = isOpen -- Menyembunyikan seluruh isi termasuk watermark
+        content.Visible = isOpen
+        title.Visible = isOpen 
+        ytClosed.Visible = not isOpen
+        ytInside.Visible = isOpen
     end)
     return content
 end
@@ -96,55 +115,28 @@ end
 local function AddBtn(parent, txt, callback)
     local b = Instance.new("TextButton", parent)
     b.Size = UDim2.new(0.92, 0, 0, 35)
-    b.Position = UDim2.new(0.04, 0, 0, (#parent:GetChildren()-1)*40 + 5)
+    b.Position = UDim2.new(0.04, 0, 0, (#parent:GetChildren()-1)*40)
     b.BackgroundColor3 = Color3.fromRGB(40, 40, 40); b.Text = txt; b.TextColor3 = Color3.new(1, 1, 1)
     b.Font = Enum.Font.SourceSansBold; b.TextSize = 14
     Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
     b.MouseButton1Click:Connect(callback)
-    return b
 end
 
--- [ 1. FRAME: MAIN MENU ]
-local MainContent = CreateFrame("Main", UDim2.new(0.05, 0, 0.2, 0), UDim2.new(0, 250, 0, 280), "Inside Brainrot Heads")
-
+-- [ 1. FRAME: MAIN MENU - NAMA DIUBAH KAPITAL ]
+local MainContent = CreateFrame("Main", UDim2.new(0.05, 0, 0.2, 0), UDim2.new(0, 250, 0, 280), "INSIDE BRAINROT HEADS")
 AddBtn(MainContent, "Claim Brainrot To Base", SpawnMiniTPMenu)
-AddBtn(MainContent, "Auto Collect Cash", function()
-    _G.autoC = not _G.autoC
-    while _G.autoC do for i=1,48 do task.spawn(function() remContainer["data.base.collectPadMoney"]:InvokeServer(i) end) end task.wait(0.5) end
-end)
-AddBtn(MainContent, "Auto Upgrade Base", function()
-    _G.autoU = not _G.autoU
-    while _G.autoU do remContainer["data.base.upgradeBase"]:FireServer(); task.wait(0.5) end
-end)
-AddBtn(MainContent, "Auto Buy All Coils", function()
-    local cList = {"red", "blue", "yellow", "water", "lava", "poison", "abyss", "inferno", "dream", "rainbow", "magma"}
-    for _, name in pairs(cList) do remContainer["data.toolShop.buySpeedCoil"]:FireServer(name) end
-end)
-AddBtn(MainContent, "Auto Rebirth", function()
-    _G.autoR = not _G.autoR
-    while _G.autoR do remContainer["data.base.rebirth"]:FireServer(); task.wait(1) end
-end)
+AddBtn(MainContent, "Auto Collect Cash", function() _G.autoC = not _G.autoC while _G.autoC do for i=1,48 do task.spawn(function() remContainer["data.base.collectPadMoney"]:InvokeServer(i) end) end task.wait(0.5) end end)
+AddBtn(MainContent, "Auto Upgrade Base", function() _G.autoU = not _G.autoU while _G.autoU do remContainer["data.base.upgradeBase"]:FireServer(); task.wait(0.5) end end)
+AddBtn(MainContent, "Auto Buy All Coils", function() local cList = {"red", "blue", "yellow", "water", "lava", "poison", "abyss", "inferno", "dream", "rainbow", "magma"} for _, n in pairs(cList) do remContainer["data.toolShop.buySpeedCoil"]:FireServer(n) end end)
+AddBtn(MainContent, "Auto Rebirth", function() _G.autoR = not _G.autoR while _G.autoR do remContainer["data.base.rebirth"]:FireServer(); task.wait(1) end end)
 
--- Watermark (Sekarang ditaruh di dalam MainContent agar hilang saat ditutup)
-local yt = Instance.new("TextLabel", MainContent)
-yt.Size = UDim2.new(1, 0, 0, 30); yt.Position = UDim2.new(0, 0, 1, -30)
-yt.Text = "YouTube : SemWok"; yt.TextColor3 = Color3.fromRGB(255, 255, 255)
-yt.Font = Enum.Font.SourceSansBold; yt.TextSize = 18; yt.BackgroundTransparency = 1
-yt.TextXAlignment = Enum.TextXAlignment.Center
-
--- [ 2. FRAME: TELEPORT NEST ]
-local TPContent = CreateFrame("TP", UDim2.new(0.35, 0, 0.2, 0), UDim2.new(0, 240, 0, 350), "Teleport Nest")
+-- [ 2. FRAME: TELEPORT NEST - NAMA DIUBAH KAPITAL ]
+local TPContent = CreateFrame("TP", UDim2.new(0.35, 0, 0.2, 0), UDim2.new(0, 240, 0, 360), "TELEPORT NEST")
 local Scroll = Instance.new("ScrollingFrame", TPContent)
-Scroll.Size = UDim2.new(1, 0, 1, -10); Scroll.Position = UDim2.new(0, 0, 0, 5)
+Scroll.Size = UDim2.new(1, 0, 1, 0); Scroll.Position = UDim2.new(0, 0, 0, 0)
 Scroll.BackgroundTransparency = 1; Scroll.CanvasSize = UDim2.new(0, 0, 0, 480); Scroll.ScrollBarThickness = 4
 
-local nests = {
-    {"Meowl", "meowl"}, {"Eleccobee", "eleccoBee"}, {"Lava Golem", "lavaGolem"}, {"Frogio Blingo", "frogioBlingo"}, 
-    {"Dragon Cannelloni", "dragonCannelloni"}, {"Job Sahur", "jobJobJobSahur"}, {"Strawberry", "strewberry"}, 
-    {"Yellow Lucky Block", "yellowLuckyBlock"}, {"Karkar Kurkur", "karkarKurkurkur"}, {"Esok Sekolah", "esokSekolah"}, 
-    {"Brainrot 67", "brainrot67"}, {"Noob", "noob"}
-}
-
+local nests = {{"Meowl", "meowl"}, {"Eleccobee", "eleccoBee"}, {"Lava Golem", "lavaGolem"}, {"Frogio Blingo", "frogioBlingo"}, {"Dragon Cannelloni", "dragonCannelloni"}, {"Job Sahur", "jobJobJobSahur"}, {"Strawberry", "strewberry"}, {"Yellow Lucky Block", "yellowLuckyBlock"}, {"Karkar Kurkur", "karkarKurkurkur"}, {"Esok Sekolah", "esokSekolah"}, {"Brainrot 67", "brainrot67"}, {"Noob", "noob"}}
 for i, v in ipairs(nests) do
     local b = Instance.new("TextButton", Scroll)
     b.Size = UDim2.new(0.9, 0, 0, 35); b.Position = UDim2.new(0.05, 0, 0, (i-1)*40)
